@@ -1,0 +1,20 @@
+{
+  "name": "RGG",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "jay",
+  "license": "yes",
+  "private": "true",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "@fastify/autoload": "^5.8.0",
+    "@fastify/mysql": "^4.2.0",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.24.3",
+    "follow-redirects": "^1.15.3",
+    "twilio": "^4.19.0"
+  }
+}
