@@ -2,6 +2,7 @@ const path = require("node:path");
 const fastify = require("fastify")({ logger: false });
 const AutoLoad = require("@fastify/autoload");
 const mysql = require("@fastify/mysql");
+
 require("dotenv").config();
 
 // Register routes
@@ -14,7 +15,10 @@ fastify.register(mysql, {
   promise: true,
   connectionString: "mysql://root@localhost/rgg",
 });
-
+// fastify.register(require('@fastify/jwt'), {
+//   secret: secret
+// })
+fastify.register(require("./src/auth/auth.js"))
 // Run the server!
 fastify.listen({ port: 3000 }, (err) => {
   if (err) {

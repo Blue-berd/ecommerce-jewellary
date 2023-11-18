@@ -2,6 +2,7 @@
 
 const errorHandler = require("./errorHandler");
 const { client, format } = require("../utils/twilio.js");
+const fastify = require("../../index.js");
 
 const generateOtp = async function () {
   // Generate a random OTP
@@ -11,7 +12,7 @@ const generateOtp = async function () {
 
 const login = async function (req, reply) {
   try {
-    const { mobile } = req.params;
+    const { mobile } = req.body;
 
     // Generate OTP
     const otp = await generateOtp();
@@ -30,12 +31,10 @@ const login = async function (req, reply) {
     return reply.code(200).send({ data: { otp, mobile }, status: 201 });
   } catch (err) {
     console.error(err);
-    return reply
-      .code(500)
-      .send({
-        data: { message: "Internal Server Error", error: err.message },
-        status: 500,
-      });
+    return reply.code(500).send({
+      data: { message: "Internal Server Error", error: err.message },
+      status: 500,
+    });
   }
 };
 
@@ -48,8 +47,8 @@ const confirmOtp = async function (req, reply) {
       "SELECT mobile_no, otp_value FROM otp WHERE mobile_no = ? ORDER BY id DESC LIMIT 1";
 
     const [result] = await fastify.mysql.query(checkRecord, [mobile]);
-
-    if (!result || result.length === 0 || result[0].otp_value !== otp) {
+    console.log(result, otp)
+    if (!result || result.length === 0 || result[0].otp_value != otp) {
       return reply
         .code(200)
         .send({ data: { message: "Invalid OTP" }, status: 200 });
@@ -62,19 +61,17 @@ const confirmOtp = async function (req, reply) {
     const [insertResult, insertErr] = await fastify.mysql.query(insertQuery, [
       mobile,
     ]);
-
+    const token = fastify.jwt.sign({mobile});
     return reply.code(201).send({
-      data: { message: "User login/signup successful", token: "" },
+      data: { message: "User login/signup successful", token: token },
       status: 201,
     });
   } catch (err) {
     console.error(err);
-    return reply
-      .code(500)
-      .send({
-        data: { message: "Internal Server Error", error: err.message },
-        status: 500,
-      });
+    return reply.code(500).send({
+      data: { message: "Internal Server Error", error: err.message },
+      status: 500,
+    });
   }
 };
 
